@@ -144,7 +144,7 @@ def text_find_times(text: str) -> List[str]:
 # Scrape logic
 # ----------------------
 
-SIMS = [f"Simulator {i}" for i in range(1,4)]
+SIMS = [f"Simulator {i}" for i in range(1,5)]
 
 # async def click_by_text(page, text: str, exact: bool = True):
 #     # Try role=button

@@ -414,7 +414,7 @@ async def collect_slots_for_date_and_sim(page, cfg: Config, date_str: str, sim_n
 async def run(cfg: Config):
     tzinfo = pytz.timezone(cfg.timezone)
     today = parse_local_today(cfg)
-    dates = [(today + timedelta(days=i+1)).strftime("%Y-%m-%d") for i in range(3)]
+    dates = [(today + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(3)]
     until_date_inclusive = (today + timedelta(days=3)).strftime("%Y-%m-%d") # we want to see through day 3 inclusive
 
     daily_grid_times = build_daily_times(cfg)
@@ -462,13 +462,44 @@ async def run(cfg: Config):
 
     # Write one CSV per day, stacking all simulators
     os.makedirs("output", exist_ok=True)
-    df = pd.DataFrame(all_rows, columns=["date","time","simulator","available"])
-    for d in dates:
-        out = df[df["date"] == d].sort_values(["simulator","time"])
-        out_path = os.path.join("output", f"availability_{d}.csv")
-        out.to_csv(out_path, index=False)
-        print(f"Wrote {out_path} ({len(out)} rows)")
 
+    # Create run timestamp column name (hour only)
+    run_timestamp = datetime.now(pytz.timezone(cfg.timezone)).strftime("%H:%M")
+
+    # Get today's date for filename
+    today_str = parse_local_today(cfg).strftime("%Y-%m-%d")
+
+    # Create new dataframe with current run data
+    df_new = pd.DataFrame(all_rows, columns=["date", "time", "simulator", "available"])
+    df_new = df_new.rename(columns={"available": run_timestamp})
+
+    # Path to today's output file
+    out_path = os.path.join("output", f"availability_{today_str}.csv")
+
+    # Check if file exists
+    if os.path.exists(out_path):
+        # Read existing data
+        df_existing = pd.read_csv(out_path)
+        
+        # Merge on date, time, simulator
+        df_combined = pd.merge(
+            df_existing, 
+            df_new, 
+            on=["date", "time", "simulator"], 
+            how="outer"
+        )
+        
+        # Sort by date, simulator, time
+        df_combined = df_combined.sort_values(["date", "simulator", "time"])
+        
+        # Write back
+        df_combined.to_csv(out_path, index=False)
+        print(f"Added column '{run_timestamp}' to {out_path} ({len(df_combined)} rows)")
+    else:
+        # Create new file
+        df_new = df_new.sort_values(["date", "simulator", "time"])
+        df_new.to_csv(out_path, index=False)
+        print(f"Created {out_path} with column '{run_timestamp}' ({len(df_new)} rows)")
 def main():
     cfg = get_config(sys.argv[1:])
     # Sanity

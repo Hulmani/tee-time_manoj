@@ -144,7 +144,7 @@ def text_find_times(text: str) -> List[str]:
 # Scrape logic
 # ----------------------
 
-SIMS = [f"Simulator {i}" for i in range(1,2)]
+SIMS = [f"Simulator {i}" for i in range(1,5)]
 
 # async def click_by_text(page, text: str, exact: bool = True):
 #     # Try role=button
@@ -414,7 +414,7 @@ async def collect_slots_for_date_and_sim(page, cfg: Config, date_str: str, sim_n
 async def run(cfg: Config):
     tzinfo = pytz.timezone(cfg.timezone)
     today = parse_local_today(cfg)
-    dates = [(today + timedelta(days=i+1)).strftime("%Y-%m-%d") for i in range(3)]
+    dates = [(today + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(3)]
     until_date_inclusive = (today + timedelta(days=3)).strftime("%Y-%m-%d") # we want to see through day 3 inclusive
 
     daily_grid_times = build_daily_times(cfg)

@@ -42,7 +42,7 @@ def get_config(argv: List[str]) -> Config:
         "timezone": os.getenv("TIMEZONE", "America/New_York"),
         "slots_per_day": int(os.getenv("SLOTS_PER_DAY", "25")),
         "slot_minutes": int(os.getenv("SLOT_MINUTES", "30")),
-        "start_time": os.getenv("START_TIME", "09:00"),
+        "start_time": os.getenv("START_TIME", "07:00"),
         "headless": env_bool("HEADLESS", False),
         "user_agent": os.getenv("USER_AGENT", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"),
         "random_delay_ms_min": int(os.getenv("RANDOM_DELAY_MS_MIN", "800")),
